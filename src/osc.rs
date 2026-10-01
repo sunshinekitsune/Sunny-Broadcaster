@@ -15,7 +15,7 @@ fn push_osc_string(buffer: &mut Vec<u8>, text: &str) {
 ///
 /// VRChat limits `text` to 144 bytes and 9 lines.
 /// Set `direct` to `true` to send directly to chat, or `false` to open the in-game UI.
-pub fn encode_chatbox_mesage(text: &str, direct: bool, play_sound: bool) -> Vec<u8> {
+pub fn encode_chatbox_message(text: &str, direct: bool, play_sound: bool) -> Vec<u8> {
     // Create a vector with pre allocated memory to avoid reallocations.
     let mut packet = Vec::with_capacity(64 + text.len());
 

@@ -20,7 +20,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         let message_text = format!("Ticks: {}\nThis is sent automagically!", ticks);
 
         // Build a packet and send to VRChat.
-        let packet = osc::encode_chatbox_mesage(&message_text, true, false);
+        let packet = osc::encode_chatbox_message(&message_text, true, false);
         socket.send(&packet)?;
 
         println!("Broadcasted: {}", message_text);
