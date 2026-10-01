@@ -1,31 +1,43 @@
 mod osc;
 
-use std::{error::Error, net::UdpSocket, thread::sleep, time::Duration};
+use eframe::egui;
+use std::error::Error;
 
-const OSC_ADDRESS: &str = "127.0.0.1:9000";
-const BROADCAST_INTERVAL: Duration = Duration::from_millis(1_500);
+#[derive(Default)]
+struct SunnyBroadcasterApp;
+
+impl SunnyBroadcasterApp {
+    fn new(_cc: &eframe::CreationContext<'_>) -> Self {
+        Self
+    }
+}
+
+impl eframe::App for SunnyBroadcasterApp {
+    fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
+        egui::CentralPanel::default().show(ui, |_ui| {});
+    }
+}
 
 fn main() -> Result<(), Box<dyn Error>> {
-    // Bind to port 0 to ask for any free outgouing UDP port.
-    let socket = UdpSocket::bind("127.0.0.1:0")?;
-    println!("Socket bound to local address: {}", socket.local_addr()?);
+    let icon_bytes = include_bytes!("../assets/icon.png");
+    let icon = eframe::icon_data::from_png_bytes(icon_bytes)?;
 
-    socket.connect(OSC_ADDRESS)?;
-    println!("Broadcasting messages to VRChat on {}", OSC_ADDRESS);
+    let options = eframe::NativeOptions {
+        viewport: egui::ViewportBuilder::default()
+            .with_title("Sunny Broadcaster")
+            .with_icon(icon)
+            .with_inner_size([400.0, 220.0])
+            .with_min_inner_size([300.0, 160.0])
+            .with_resizable(true),
+        renderer: eframe::Renderer::Glow,
+        ..Default::default()
+    };
 
-    let mut ticks: u64 = 0;
-    loop {
-        ticks += 1;
+    eframe::run_native(
+        "com.sunshinekitsune.sunny-broadcaster",
+        options,
+        Box::new(|cc| Ok(Box::new(SunnyBroadcasterApp::new(cc)))),
+    )?;
 
-        let message_text = format!("Ticks: {}\nThis is sent automagically!", ticks);
-
-        // Build a packet and send to VRChat.
-        let packet = osc::encode_chatbox_message(&message_text, true, false);
-        socket.send(&packet)?;
-
-        println!("Broadcasted: {}", message_text);
-
-        // Handle ratelimiting.
-        sleep(BROADCAST_INTERVAL);
-    }
+    Ok(())
 }

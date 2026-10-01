@@ -1,4 +1,5 @@
 //! OSC packet encoding for VRChat.
+#![allow(dead_code)]
 
 /// Appends an OSC 1.0 string to `buffer`, padded with null bytes to a 4-byte boundary.
 fn push_osc_string(buffer: &mut Vec<u8>, text: &str) {
@@ -13,8 +14,9 @@ fn push_osc_string(buffer: &mut Vec<u8>, text: &str) {
 
 /// Encodes an OSC chatbox message packet.
 ///
-/// VRChat limits `text` to 144 bytes and 9 lines.
+/// VRChat limits `text` to 144 characters and 9 lines.
 /// Set `direct` to `true` to send directly to chat, or `false` to open the in-game UI.
+#[must_use]
 pub fn encode_chatbox_message(text: &str, direct: bool, play_sound: bool) -> Vec<u8> {
     // Create a vector with pre allocated memory to avoid reallocations.
     let mut packet = Vec::with_capacity(64 + text.len());
